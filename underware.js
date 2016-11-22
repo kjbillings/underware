@@ -193,16 +193,13 @@
 	/**
 	 * [objWithout Creates a new object without the specified properties.]
 	 * @param  {Object}	object [Object to be returned without the specified properties.]
-	 * @return {Integer|String|Array} [New object without the specified properties. ]
+	 * @return {Object} [New object without the specified properties. ]
 	 */
 	objWithout: function objWithout(object, without){
-		var newobj = _.clone(object);
-		if(this.isType(without, 'string') || this.isType(without, 'integer')) delete newobj[without];
-		if(this.isType(without, 'array')){
-			for (var i = without.length - 1; i >= 0; i--) {
-				delete newobj[without[i]];
-			}
-		}
+		var newobj = {}, self = this;
+		this.each(object, function(k, v){
+			if(((self.isType(without, 'string') || self.isType(without, 'integer') && without !== "k") || (self.isArray(without) && !self.includes(without, k))) ) newobj[k] = v;
+		});
 		return newobj;
 	},
 
@@ -234,12 +231,12 @@
 	},
 
 	/**
-	 * [objLengthDeep Finds the length of the object given including all child generations, and the objects themselves]
+	 * [lengthDeep Finds the length of the object given including all child generations, and the objects themselves]
 	 * @param  {Object} object [Object to be counted]
 	 * @param  {String} format [If set to "values", it will return a count of all the non-object child values, if set to "childObjects", it will return a count of all child objects, if left undefined, it will default to a count of all children of all types.]
 	 * @return {Integer} [Length of object and all it's children]
 	 */
-  objLengthDeep: function objLengthDeep(object, format){
+  lengthDeep: function lengthDeep(object, format){
 		return this.objFlatten(object, format).length;
   },
 
