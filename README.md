@@ -230,11 +230,7 @@ var x = [
 
 U.arrayRemove(x, "id", 3);
 
---> [ 
-	{id: 1, name: "Master Chief"},
-	{id: 2, name: "Cortana"},
-	{id: 4, name: "Brute"}
-];
+--> [ {id: 1, name: "Master Chief"}, {id: 2, name: "Cortana"}, {id: 4, name: "Brute"} ];
 ```
 
 -----
@@ -243,8 +239,7 @@ U.arrayRemove(x, "id", 3);
 Returns first occurance of key value pair inside an array.
 
 ```js
-var x = [ 
-	{id: 1, name: "Rory Gilmore"},
+var x = [ {id: 1, name: "Rory Gilmore"},
 	{id: 2, name: "Lorelai"},
 	{id: 3, name: "Babette"},
 	{id: 4, name: "Paris"}
@@ -321,11 +316,7 @@ U.objWithout({
 	favorite: "pie"
 }, ["id", "deaths"]);
 
--->	{
-	name: "Dean Winchester",
-	birthday: "01-24-1979",
-	favorite: "pie"
-};
+-->	{ name: "Dean Winchester", birthday: "01-24-1979", favorite: "pie" };
 ```
 
 -----
@@ -336,10 +327,7 @@ Create a new object by pulling a specified list of properties from a given objec
 ```js
 U.objWithFrom(["id", "deaths"], { id: 12, name: "Dean Winchester", deaths: 6, birthday: "01-24-1979", favorite: "pie" });
 
--->	{
-	id: 12,
-	deaths: 6
-};
+-->	{ id: 12, deaths: 6 };
 ```
 -----
 
@@ -447,11 +435,7 @@ U.truthyObject({
 	hasDriversLiscens: false
 });
 
--->	{
-	eatsMeat: true,
-	isScientist: true,
-	lovesLedZeppelin: true
-};
+-->	{ eatsMeat: true, isScientist: true, lovesLedZeppelin: true };
 ```
 -----
 
@@ -466,9 +450,7 @@ U.falseyObject({
 	hasDriversLiscens: false
 });
 
--->	{
-	hasDriversLiscens: false
-};
+-->	{ hasDriversLiscens: false };
 ```
 -----
 
@@ -485,11 +467,7 @@ U.compactObject({
 	hasDriversLiscens: false
 }, true);
 
--->	{
-	eatsMeat: true,
-	isScientist: true,
-	lovesLedZeppelin: true
-};
+-->	{ eatsMeat: true, isScientist: true, lovesLedZeppelin: true };
 ```
 -----
 
@@ -887,20 +865,6 @@ U.renameFunction("vegetables", fruits);
 -----
 
 #### `U.logIt(messages, type, options)
-Tool for robust logging of your app's processes console log, checkpoint, warn, info, and error.
-
-```js
-
-U.logIt(["================", "App Started", "================"], "checkpoint")
-
---> ✓ ================
---> ✓ App Started
---> ✓ ================
-
-```
------
-
-#### `U.deparam(params, coerce)
 Tool for robust logging of your app's processes console log, checkpoint, warn, info, and error.
 
 ```js
