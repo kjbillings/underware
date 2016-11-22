@@ -129,21 +129,6 @@ U.isType("The Winchester's Baby", "object");
 
 -----
 
-#### `U.isType(argument, type)`
-Checks if variable is of the specified type.
-
-```js
-U.isType(1967, "number");
-
---> true
-
-U.isType("The Winchester's Baby", "object");
-
---> false
-```
-
------
-
 #### `U.isDef(argument)`
 Checks if variable is defined.
 
