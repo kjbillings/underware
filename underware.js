@@ -139,13 +139,13 @@
 		 * @return {Array}   [Array cleaned of given value. ]
 		 */
 		arrayRemove: function arrRemove(array, value){
-		  for (var i = 0; i < array.length; i++){
-		    if (array[i] === value){         
-		      array.splice(i, 1);
-		      i--;
-		    }
-		  }
-		  return array;
+			for (var i = 0; i < array.length; i++){
+				if (array[i] === value){         
+					array.splice(i, 1);
+					i--;
+				}
+			}
+			return array;
 		},
 
 		/**
@@ -173,11 +173,11 @@
 		 */
 		objFromArrayWhere: function objFromArrayWhere(array, key, value){
 			var x;
-		  for (var i = 0; i < array.length; i++){
-		  	var y = array[i][key];
-		  	if(y === value) x = array[i];
-		  }
-		  return x;
+			for (var i = 0; i < array.length; i++){
+				var y = array[i][key];
+				if(y === value) x = array[i];
+			}
+			return x;
 		},
 
 		/**
@@ -246,9 +246,9 @@
 		 * @param  {String} format [If set to "values", it will return a count of all the non-object child values, if set to "childObjects", it will return a count of all child objects, if left undefined, it will default to a count of all children of all types.]
 		 * @return {Integer} [Length of object and all it's children]
 		 */
-	  lengthDeep: function lengthDeep(object, format){
+		lengthDeep: function lengthDeep(object, format){
 			return this.objFlatten(object, format).length;
-	  },
+		},
 
 		/**
 		 * [objFlatten Takes all child generations of an object and puts them at the end of the top level, flattening the given object to a single level array.]
@@ -256,36 +256,36 @@
 		 * @param  {String} format [If set to "values", it will return all the non-object child values, if set to "childObjects", it will return all child objects, if left undefined, it will default to returning all children of all types.]
 		 * @return {Array} [All values and child values of object given and it's sub-objects]
 		 */
-	  objFlatten: function objFlatten(object, format){
+		objFlatten: function objFlatten(object, format){
 			var c = [], self = this;
-	  	function loop(d){
-	  		self.each(d, function(k, v){
-	  			var isobj = self.isObject(v);
-	  			switch(format){
-	  				case "values":
-		  				if(isobj) loop(v); else c.push(v);
-	  				break;
-	  				case "childObjects":
-		  				if(isobj){
-		  					loop(v);
-		  					c.push(v);
-		  				}
-	  				break;
-	  				default:
-		  				if(isobj) loop(v);
-		  				c.push(v);
-	  			}
-	  		});
+			function loop(d){
+				self.each(d, function(k, v){
+					var isobj = self.isObject(v);
+					switch(format){
+						case "values":
+							if(isobj) loop(v); else c.push(v);
+						break;
+						case "childObjects":
+							if(isobj){
+								loop(v);
+								c.push(v);
+							}
+						break;
+						default:
+							if(isobj) loop(v);
+							c.push(v);
+					}
+				});
 			}
 			loop(object);
 			return c;
-	  },
+		},
 
-	  /**
-	   * [objGetChildKeys Get an array of all property names from object.]
-	   * @param  {Object} object [Object you want to collect the property names of.]
-	   * @return {Array}        [Array of property names]
-	   */
+		/**
+		 * [objGetChildKeys Get an array of all property names from object.]
+		 * @param  {Object} object [Object you want to collect the property names of.]
+		 * @return {Array}        [Array of property names]
+		 */
 		getKeys: function objGetChildKeys(object){
 			var arr = [];
 			this.each(object, function(k, v){ arr.push(k); });
@@ -400,55 +400,55 @@
 		 * @param  {Mixed} value [Value to search for in array]
 		 * @return {Boolean}   [Indicates whether or not the array given contains the value given]
 		 */
-	  includes: function includes(haystack, needle){
-	  	if(this.isDef(haystack) && this.isDef(needle)){	
-		  	switch(typeof haystack){
-		  		case 'function':
-		  		case 'string':
-		  		case 'array': return (haystack.indexOf(needle) !== -1);
-		  		case 'object': return this.isDef(haystack[needle]);
-		  	}
-	  	}
-	  	return;
-	  },
-
-	  /**
-	   * [merge Takes two objects and merges them together]
-	   * @param  {Object} object   [Original object]
-	   * @param  {Object} argument [Object to merge into original object]
-	   * @param  {Boolean} overwrite  [True by default, if set to false, will not overwrite existing values in object with matching key, only adding new values that are yet unlisted unlisted]
-	   * @return {Object}          [Object that has merged with argument object]
-	   */
-	  merge: function merge(object, argument, overwrite){
-	  	var o = overwrite || true, self = this;
-			function loop(x, y){
-	  		self.each(y, function(k, v){
-	  			if(self.isDef(x[k])){
-	  				if(self.isType(x[k], 'object') && self.isType(v, 'object')) loop(x[k], v);
-	  				else if(!o) return;
-	  			} else x[k] = v;
-		  	});
+		includes: function includes(haystack, needle){
+			if(this.isDef(haystack) && this.isDef(needle)){	
+				switch(typeof haystack){
+					case 'function':
+					case 'string':
+					case 'array': return (haystack.indexOf(needle) !== -1);
+					case 'object': return this.isDef(haystack[needle]);
+				}
 			}
-	  	if(this.isDef(argument) && this.isDef(object)){
-	  		loop(object, argument);
-	  	}
-	  	return object;
-	  },
+			return;
+		},
 
-	  /**
-	   * [stringToArray Split a string into an array of strings ( or integers where possible ) split by a delimiter]
-	   * @param  {String} string [String to be split into an array]
-	   * @param  {String} delimiter [Delimiter to split the given string by, defaulting to ",".]
-	   * @return {Array} [Array of strings and integers(if anything was able to be converted to an integer)]
-	   */
-	  stringToArray: function stringToArray(string, delimiter){
-	  	var y = delimiter || ",", x = string.split(y);
-	  	for (var i = x.length - 1; i >= 0; i--){
-	  		var n = parseInt(x[i], 0);
-	  		if(!isNaN(n)) x[i] = n;
-	  	}
-	  	return x;
-	  },
+		/**
+		 * [merge Takes two objects and merges them together]
+		 * @param  {Object} object   [Original object]
+		 * @param  {Object} argument [Object to merge into original object]
+		 * @param  {Boolean} overwrite  [True by default, if set to false, will not overwrite existing values in object with matching key, only adding new values that are yet unlisted unlisted]
+		 * @return {Object}          [Object that has merged with argument object]
+		 */
+		merge: function merge(object, argument, overwrite){
+			var o = overwrite || true, self = this;
+			function loop(x, y){
+				self.each(y, function(k, v){
+					if(self.isDef(x[k])){
+						if(self.isType(x[k], 'object') && self.isType(v, 'object')) loop(x[k], v);
+						else if(!o) return;
+					} else x[k] = v;
+				});
+			}
+			if(this.isDef(argument) && this.isDef(object)){
+				loop(object, argument);
+			}
+			return object;
+		},
+
+		/**
+		 * [stringToArray Split a string into an array of strings ( or integers where possible ) split by a delimiter]
+		 * @param  {String} string [String to be split into an array]
+		 * @param  {String} delimiter [Delimiter to split the given string by, defaulting to ",".]
+		 * @return {Array} [Array of strings and integers(if anything was able to be converted to an integer)]
+		 */
+		stringToArray: function stringToArray(string, delimiter){
+			var y = delimiter || ",", x = string.split(y);
+			for (var i = x.length - 1; i >= 0; i--){
+				var n = parseInt(x[i], 0);
+				if(!isNaN(n)) x[i] = n;
+			}
+			return x;
+		},
 
 		/**
 		 * [addpercent Converts a string of a number into an integer and adds a percentage specified.]
@@ -491,21 +491,21 @@
 			function k(y){
 				if (y >= 1000000000000) return (y / 1000000000000).toFixed(1).replace(/\.0$/, '') + 'T';
 				else if (y >= 1000000000) return (y / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
-		    else if (y >= 1000000) return (y / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
-		    else if (y >= 1000) return (y / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
-		    else return y;
+				else if (y >= 1000000) return (y / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+				else if (y >= 1000) return (y / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+				else return y;
 			}
 			function th(y, j, k){
 				if (j === 1 && k !== 11) return y + "st";
-		    else if (j === 2 && k !== 12) return y + "nd";
-		    else if (j === 3 && k !== 13) return y + "rd";
-		    else return y + "th";
+				else if (j === 2 && k !== 12) return y + "nd";
+				else if (j === 3 && k !== 13) return y + "rd";
+				else return y + "th";
 			}
 			function TH(y, j, k){
 				if (j === 1 && k !== 11) return y + "ST";
-		    else if (j === 2 && k !== 12) return y + "ND";
-		    else if (j === 3 && k !== 13) return y + "RD";
-		    else return y + "TH";
+				else if (j === 2 && k !== 12) return y + "ND";
+				else if (j === 3 && k !== 13) return y + "RD";
+				else return y + "TH";
 			}
 			function commas(n){
 				return n.toFixed().replace(new RegExp(/(\d)(?=(\d{3})+$)/g), '$1,');
@@ -516,14 +516,14 @@
 				b = (this.isDef(b.format)) ? b.format : b;
 			}
 			if(this.isDef(a)){
-				var x, y = (this.isType(a, 'integer')) ? a : parseInt(a);
+				var x, y = (this.isType(a, 'integer')) ? a : parseInt(a, 10);
 				if(b === "k"){
 					x = k(y);
 				} else if(b === "th" || b === "TH"){
-			    var j = y % 10, p = a % 100;
-			    y = commas(y);
-			    if(b === "th") x = th(y, j, p);
-			    else x = TH(y, j, p);
+					var j = y % 10, p = a % 100;
+					y = commas(y);
+					if(b === "th") x = th(y, j, p);
+					else x = TH(y, j, p);
 				} else {
 					x = commas(y);
 					if(x === 0 && b === "noZero") x = "--";
@@ -538,7 +538,7 @@
 		 * @return {String}   [Number string with commas for thousands. ]
 		 */
 		numCommas: function numCommas(string){
-	    return string.toString().replace(/[^\d\.]/g,"").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+			return string.toString().replace(/[^\d\.]/g,"").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 		},
 
 		/**
