@@ -228,7 +228,7 @@ var x = [
 	{id: 4, name: "Brute"}
 ];
 
-U.arrayRemove(x, "id", 3);
+U.arrayRemoveWhere(x, "id", 3);
 
 --> [ {id: 1, name: "Master Chief"}, {id: 2, name: "Cortana"}, {id: 4, name: "Brute"} ];
 ```
@@ -245,7 +245,7 @@ var x = [ {id: 1, name: "Rory Gilmore"},
 	{id: 4, name: "Paris"}
 ];
 
-U.arrayRemove(x, "id", 3);
+U.objFromArrayWhere(x, "id", 3);
 
 -->	{id: 3, name: "Babette"};
 ```
