@@ -47,7 +47,7 @@ U.isFilled(true);
 
 --> true
 
-U.isTruthy({});
+U.isFilled({});
 
 --> false
 ```
