@@ -247,36 +247,36 @@
 	 * @return {Array} [All values and child values of object given and it's sub-objects]
 	 */
   objFlatten: function objFlatten(object, format){
-  	var c = [], self = this;
+		var c = [], self = this;
   	function loop(d){
-  		for (var i = self.length(d) - 1; i >= 0; i--){
-  			var isobj = self.isType(d[i], 'object');
+  		self.each(d, function(k, v){
+  			var isobj = self.isObject(v);
   			switch(format){
-  				case "values": 
-	  				if(isobj) loop(d[i]); else c.push(d[i]);
+  				case "values":
+	  				if(isobj) loop(v); else c.push(v);
   				break;
-  				case "childObjects": 
-	  				if(isobj){ 
-	  					loop(d[i]);
-	  					c.push(d[i]); 
+  				case "childObjects":
+	  				if(isobj){
+	  					loop(v);
+	  					c.push(v);
 	  				}
   				break;
   				default:
-	  				if(isobj) loop(d[i]);
-	  				c.push(d[i]); 
+	  				if(isobj) loop(v);
+	  				c.push(v);
   			}
-	  	}
+  		});
 		}
 		loop(object);
 		return c;
   },
 
   /**
-   * [objGetChildKeys description]
-   * @param  {[type]} object [description]
-   * @return {[type]}        [description]
+   * [objGetChildKeys Get an array of all property names from object.]
+   * @param  {Object} object [Object you want to collect the property names of.]
+   * @return {Array}        [Array of property names]
    */
-	objGetChildKeys: function objGetChildKeys(object){
+	getKeys: function objGetChildKeys(object){
 		var arr = [];
 		this.each(object, function(k, v){ arr.push(k); });
 		return arr;
@@ -310,7 +310,7 @@
 	 * @param  {String} delimiter [Delimiter in the variable "b" to split by]
 	 * @return {Object}   [Sub-object in given object specified by path given options]
 	 */
-	objGetDeep: function objGetDeep(object, path, delimiter){
+	getDeep: function objGetDeep(object, path, delimiter){
 		var d = delimiter || '.', x = path.split(d), pi= 0, self = this;
 		while(object && x.length){ 
 			var i = x.shift(), e = object[i];
@@ -337,7 +337,7 @@
 	 * @return {Object} [Object with only truthy values]
 	 */
 	truthyObject: function truthyObject(object){
-		return this.compactObject(object, false);
+		return this.compactObject(object, true);
 	},
 
 	/**
@@ -346,7 +346,7 @@
 	 * @return {Object} [Object with only falsey values]
 	 */
 	falseyObject: function falseyObject(object){
-		return this.compactObject(object, true);
+		return this.compactObject(object, false);
 	},
 
 	/**
@@ -371,18 +371,35 @@
 	 * @param  {String} string [String to have first letter capitalized]
 	 * @return {String} [String produced]
 	 */
-	ucfirst: function ucfirst(string){ 
+	ucFirst: function ucFirst(string){ 
 		return string.charAt(0).toUpperCase() + string.slice(1);
 	},
 
 	/**
-	 * [includes Check whether or not an array contains a value]
-	 * @param  {Array|String} argument [Array to find a value within]
+	 * [lcFirst Lowercases first letter of a string. ]
+	 * @param  {String} string [String to have first letter lowercased]
+	 * @return {String} [String produced]
+	 */
+	lcFirst: function lcFirst(string){ 
+		return string.charAt(0).toLowerCase() + string.slice(1);
+	},
+
+	/**
+	 * [includes Check whether or not an array contains a value, an object contains a property, or a string contains a substring. ]
+	 * @param  {Object|Array|String} argument [Array to find a value within]
 	 * @param  {Mixed} value [Value to search for in array]
 	 * @return {Boolean}   [Indicates whether or not the array given contains the value given]
 	 */
-  includes: function includes(array, value){
-  	return (this.isDef(array) && this.isDef(value) && ((this.isType(array.indexOf, 'function') && array.indexOf(value) !== -1) || U.isDef(array[value]))) ? true : false;
+  includes: function includes(haystack, needle){
+  	if(this.isDef(haystack) && this.isDef(needle)){	
+	  	switch(typeof haystack){
+	  		case 'function':
+	  		case 'string':
+	  		case 'array': return (haystack.indexOf(needle) !== -1);
+	  		case 'object': return this.isDef(haystack[needle]);
+	  	}
+  	}
+  	return;
   },
 
   /**
@@ -429,12 +446,11 @@
 	 * @param  {Integer} b [A whole number representing a percentage to be added to the given number.]
 	 * @return {Integer}   [Returns an integer of the number with the added percentage.]
 	 */
-	addPercent: function addpercent(a, b){
-		if(this.hasNumber(a)){
-			var x = parseInt(a, 10), p = parseInt(b, 10);
-			return x+(x*(p/100));
-		} else console.warn("add percent requires 'a' to be a string of a number");
-		return 0;
+	addPercent: function addPercent(percent, value){
+		if(this.isString(percent)) percent = parseInt(percent, 10);
+		if(this.isString(value)) value = parseInt(value, 10);
+		if(this.isNumber(percent) && this.isNumber(value)) return value+(value*(percent/100));
+		return;
 	},
 
 	/**
@@ -490,7 +506,7 @@
 			b = (this.isDef(b.format)) ? b.format : b;
 		}
 		if(this.isDef(a)){
-			var x, y = (this.isType(a, 'integer')) ? a : _.parseInt(a);
+			var x, y = (this.isType(a, 'integer')) ? a : parseInt(a);
 			if(b === "k"){
 				x = k(y);
 			} else if(b === "th" || b === "TH"){
@@ -504,6 +520,15 @@
 			}
 			return x;
 		}
+	},
+
+	/**
+	 * [numCommas Add commas to a string of numbers for thousands. ]
+	 * @param  {String} string [String of numbers to add commas to for thousands. ]
+	 * @return {String}   [Number string with commas for thousands. ]
+	 */
+	numCommas: function numCommas(string){
+    return string.toString().replace(/[^\d\.]/g,"").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 	},
 
 	/**
@@ -556,20 +581,21 @@
 		lowercase: /([a-z])+/i,
 		zip: /\d{5}(-\d{4})?/i,
 		letter: /([A-Z][a-z])+/i,
+		zipcode: /\d{5}(-\d{4})?/i,
 		tag: /\B\#[\w0-9_-]{1,25}/g,
 		special: /([^A-Za-z0-9\s])+/i,
 		username: /\B@[\w\._-]{1,24}/g,
 		alphanumeric: /([0-9a-zA-Z-_])+/i,
 		name: /^([A-Z]){1}([ A-Za-z']){1,29}$/,
-		date: /([0-9]{2}\/[0-9]{2}\/[0-9]{4})/i,
 		scheme: /(^|[^\/])(www\.[\S]+\.[\w]+)(\b|$)/gim,
-		timestamp: /([0-9]{2}\/[0-9]{2}\/[0-9]{4}\s[0-9]{2}\:[0-9]{2}\s[A-Z]{2})/,
 		website: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i,
 		protocol: /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim,
 		email: /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i,
 		youtubeurl: /^https?:\/\/(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/,
 		vimeourl: /https?:\/\/(?:www\.)?vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|)([0-9]{8,11})/,
-		url: /((https?|ftp)\:\/\/)?([a-z0-9+!*(),;?&=\$_.-]+(\:[a-z0-9+!*(),;?&=\$_.-]+)?@)?([a-z0-9-.]*)\.([a-z]{2,3})(\:[0-9]{2,5})?(\/([a-z0-9+\$_\-~@\(\)\%]\.?)+)*\/?(\?[a-z+&\$_.-][a-z0-9;:@&%=+\/\$_.-]*)?(#[a-z_.-][a-z0-9+\$_.-]*)?/i
+		timestamp: /(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+)|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d)|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d)/,
+		url: /((https?|ftp)\:\/\/)?([a-z0-9+!*(),;?&=\$_.-]+(\:[a-z0-9+!*(),;?&=\$_.-]+)?@)?([a-z0-9-.]*)\.([a-z]{2,3})(\:[0-9]{2,5})?(\/([a-z0-9+\$_\-~@\(\)\%]\.?)+)*\/?(\?[a-z+&\$_.-][a-z0-9;:@&%=+\/\$_.-]*)?(#[a-z_.-][a-z0-9+\$_.-]*)?/i,
+		date: /^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]|(?:Jan|Mar|May|Jul|Aug|Oct|Dec)))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2]|(?:Jan|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)(?:0?2|(?:Feb))\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9]|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep))|(?:1[0-2]|(?:Oct|Nov|Dec)))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/i
 	},
 
 	/**
@@ -701,15 +727,6 @@
 	},
 
 	/**
-	 * [numCommas Add commas to a string of numbers for thousands. ]
-	 * @param  {String} string [String of numbers to add commas to for thousands. ]
-	 * @return {String}   [Number string with commas for thousands. ]
-	 */
-	numCommas: function numCommas(string){
-    return x.toString().replace(/[^\d\.]/g,"").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
-	},
-
-	/**
 	 * [objToConstructor Transform an object of properties into a constructor. ]
 	 * @param  {Object} object [An object of properties to turn into a constructor. ]
 	 * @param  {String} name   [The name to be given to the constructor being created. ]
@@ -737,7 +754,7 @@
 	 * @param  {String} type    [Type of function to use in the console, (warn, error, info, checkpoint)]
 	 * @param  {Object} options [options = {activated: Boolean describing wether or not to log it live to the console.}]
 	 */
-	logIt: function logIt(x, type, options){
+	logIt: function logIt(messages, type, options){
 		var debug = options.debug, y;
 		function print(z){
 			switch(type){
@@ -750,50 +767,14 @@
 			}
 		}
 		if( options.activated ){
-			if(this.isType(x, 'array')){
-				for (var i = 0; i <= x.length - 1; i++) {
-					print(x[i]);
+			if(this.isType(messages, 'array')){
+				for (var i = 0; i <= messages.length - 1; i++) {
+					print(messages[i]);
 				}
-			} else print(x);
+			} else print(messages);
 			if(debug === "debug") debugger;
 		}
-	},
-
-	/**
-	 * [deparam Takes a string of URI parameters and breaks it down into a standard object. ]
-	 * @param  {String} params [String of URI parameters to be broken down into an object.]
-	 * @param  {object} coerce [description]
-	 * @return {object}        [Object of URI parameters from given string.]
-	 */
-	deparam: function deparam( params, coerce ) {
-    var obj = {}, coerce_types = { 'true': !0, 'false': !1, 'null': null }, self = this;
-    this.each( params.replace( /\+/g, ' ' ).split( '&' ), function(j,v){
-      var param = v.split( '=' ), key = decodeURIComponent( param[0] ), val, cur = obj, i = 0, keys = key.split( '][' ), keys_last = keys.length - 1;
-      if ( /\[/.test( keys[0] ) && /\]$/.test( keys[ keys_last ] ) ) {
-        keys[ keys_last ] = keys[ keys_last ].replace( /\]$/, '' );
-        keys = keys.shift().split('[').concat( keys );   
-        keys_last = keys.length - 1;
-      } else keys_last = 0;
-      if ( param.length === 2 ) {
-        val = decodeURIComponent( param[1] );
-          if ( coerce ) {
-          val = val && !isNaN(val)            ? +val              // number
-            : val === 'undefined'             ? undefined         // undefined
-            : coerce_types[val] !== undefined ? coerce_types[val] // true, false, null
-            : val;                                                // string
-        }
-        if ( keys_last ) {
-          for ( ; i <= keys_last; i++ ) {
-            key = keys[i] === '' ? cur.length : keys[i];
-            cur = cur[key] = i < keys_last ? cur[key] || ( keys[i+1] && isNaN( keys[i+1] ) ? {} : [] ) : val;
-          }
-        } else {          
-          if ( self.isArray( obj[key] ) ) obj[key].push( val );
-          else if ( obj[key] !== undefined ) obj[key] = [ obj[key], val ];
-          else obj[key] = val; 
-        }
-      } else if ( key ) obj[key] = coerce ? undefined : '';
-    });
-  }
+	}
+	
 };
 }());
