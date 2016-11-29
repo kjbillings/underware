@@ -35,7 +35,7 @@
 		 * @return {Boolean}
 		 */
 		isFilled: function isFilled(argument){
-			return (this.isTruthy(argument) || argument === "" || argument === {} || argument === []);
+			return ( this.length(argument) > 0 );
 		},
 
 		/**
@@ -54,6 +54,15 @@
 		 */
 		isObject: function isObject(argument) {
 			return (this.isType(argument, 'object'));
+		},
+
+		/**
+		 * [isObject Checks for whether or not a variable is an object.]
+		 * @param  {Mixed}  argument [Variable to be tested for whether or not it is an object.]
+		 * @return {Boolean}          [Indicates whether or not the given variable is an object.]
+		 */
+		isFunction: function isFunction(argument) {
+			return (this.isType(argument, 'function'));
 		},
 
 		/**
@@ -85,6 +94,17 @@
 			if(x === null) return false;				
 			if(type === 'array') return (argument instanceof Array);
 			return (x === type);
+		},
+
+		/**
+		 * [includes Check whether or not an array contains a value, an object contains a property, or a string contains a substring. ]
+		 * @param  {Object|Array|String} argument [Array to find a value within]
+		 * @param  {Mixed} value [Value to search for in array]
+		 * @return {Boolean}   [Indicates whether or not the array given contains the value given]
+		 */
+		type: function type(argument){
+			if(this.isArray(argument)) return "array";
+			return (typeof argument);
 		},
 
 		/**
@@ -235,9 +255,9 @@
 		 */
 		length: function length(object){
 			if(this.isType(object, "array") || this.isType(object, "string")) return object.length;
-			if(this.isType(object, "object")){
+			else if(this.isType(object, "object")){
 				var l = 0, i; for (i in object){ if (object.hasOwnProperty(i)) l++; } return l;
-			}
+			} else return;
 		},
 
 		/**
@@ -402,11 +422,11 @@
 		 */
 		includes: function includes(haystack, needle){
 			if(this.isDef(haystack) && this.isDef(needle)){	
-				switch(typeof haystack){
-					case 'function':
-					case 'string':
-					case 'array': return (haystack.indexOf(needle) !== -1);
-					case 'object': return this.isDef(haystack[needle]);
+				switch(true){
+					case this.isString(haystack):
+					case this.isArray(haystack): return (haystack.indexOf(needle) !== -1);
+					case this.isFunction(haystack):
+					case this.isObject(haystack): return (needle in haystack);
 				}
 			}
 			return;
@@ -789,7 +809,7 @@
 	};
 
 
-	if(U.isDef(module) && U.isDef(module.imports)) module.exports = U;
-	if(U.isDef(window)) window.U = U;
+	if(typeof window !== 'undefined') window.U = U;
+	if(typeof module !== 'undefined' && U.isDef(module.exports)) module.exports = U;
 	
 }());
